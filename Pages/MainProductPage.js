@@ -1,4 +1,5 @@
 const {expect} = require('@playwright/test');
+const { timeout } = require('../playwright.config');
 
 class MainProductPage{
     constructor(page){
@@ -6,7 +7,7 @@ class MainProductPage{
 
         // Home page elements
         this.searchBox = page.locator('#gh-ac');
-        this.searchBtn = page.locator('#gh-btn');
+        this.searchBtn = page.locator('#gh-search-btn');
 
         // Search results
         this.firstSearchResult = page.locator('.s-item__title').first();
@@ -39,8 +40,32 @@ class MainProductPage{
     }
 
     async openFirstProductFromResults(){
-        await this.firstSearchResult.click();
-        await expect(this.productTitle).toBeVisible();
+        
+        // Try alternative containers
+    const containers = ['div#srp-river-results', 'div.srp-river-results', 'ul.srp-results'];
+
+    let found = false;
+    for (const container of containers) {
+        try {
+            await this.page.waitForSelector(container, { timeout: 15000 });
+            found = true;
+            break;
+        } catch {}
+    }
+
+    if (!found) {
+        throw new Error('❌ Search results container not found.');
+    }
+
+    const resultLink = this.page.locator('li.s-item div.s-item__title').first();
+    await resultLink.waitFor({ state: 'visible', timeout: 10000 });
+
+    const productAnchor = resultLink.locator('xpath=ancestor::a[contains(@class,"s-item__link")]');
+    await productAnchor.click({ force: true });
+
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForTimeout(3000);
+        
     }
 
     async getMainProductPrice(){

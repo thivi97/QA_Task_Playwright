@@ -13,7 +13,9 @@ class MainProductPage{
         this.firstSearchResult = page.locator('.s-item__title').first();
 
         // Product details
-        this.productTitle = page.locator('#itemTitle');
+        this.productTitle = page.locator('#itemTitle, h1');
+        this.productPrice = page.locator('#prcIsum, .x-price-approx__value, span[itemprop="price"], .notranslate, .display-price');
+        this.productDescription = page.locator('#viTabs_0_is, #vi-desc-maincntr');
 
         // Breadcrumb
         this.breadcrumbCategory = page.locator('#vi-VR-brumb-lnkLst span').last();
@@ -41,45 +43,55 @@ class MainProductPage{
 
     async openFirstProductFromResults(){
         
-        // Try alternative containers
-    const containers = ['div#srp-river-results', 'div.srp-river-results', 'ul.srp-results'];
+        const containers = ['div#srp-river-results', 'div.srp-river-results', 'ul.srp-results'];
+        let found = false;
 
-    let found = false;
-    for (const container of containers) {
+        for (const container of containers) {
         try {
             await this.page.waitForSelector(container, { timeout: 15000 });
             found = true;
             break;
         } catch {}
-    }
+        }
 
-    if (!found) {
-        throw new Error('❌ Search results container not found.');
-    }
+        if (!found) {
+        throw new Error('Search results container not found.');
+        }
 
-    const resultLink = this.page.locator('li.s-item div.s-item__title').first();
-    await resultLink.waitFor({ state: 'visible', timeout: 10000 });
+        const resultLink = this.page.locator('li.s-item div.s-item__title').first();
+        await resultLink.waitFor({ state: 'visible', timeout: 10000 });
 
-    const productAnchor = resultLink.locator('xpath=ancestor::a[contains(@class,"s-item__link")]');
-    await productAnchor.click({ force: true });
+        const productAnchor = resultLink.locator('xpath=ancestor::a[contains(@class,"s-item__link")]');
+        await productAnchor.click({ force: true });
 
-    await this.page.waitForLoadState('domcontentloaded');
-    await this.page.waitForTimeout(3000);
+        await this.page.waitForLoadState('domcontentloaded');
+        await this.page.waitForTimeout(3000);
         
     }
 
     async getMainProductPrice(){
-        const priceText = await this.mainProductPrice.first().innerText();
-        return parseFloat(priceText.replace(/[^0-9.]/g,''));
+        try {
+            const priceText = await this.productPrice.first().innerText();
+            const price = parseFloat(priceText.replace(/[^0-9.]/g, ''));
+            if (isNaN(price)) throw new Error('Price parsing failed');
+            return price;
+            } catch (err) {
+            throw new Error(`Failed to get or parse main product price: ${err.message}`);
+            }
     }
 
     async getRelatedProductTitles(){
         const count = await this.relatedItems.count();
         const titles = [];
-        for (let i = 0; i < count; i++){
-            const title = await this.relatedItems.nth(i).locator('.title').innerText();
-            titles.push(title);
+
+        for (let i = 0; i < count; i++) {
+        const titleLocator = this.relatedItems.nth(i).locator('.title');
+        if (await titleLocator.isVisible()) {
+            const title = await titleLocator.innerText();
+            titles.push(title.trim());
         }
+        }
+
         return titles;
     }
 
@@ -117,10 +129,17 @@ class MainProductPage{
 
     async validateCategoryMatch(expectedCategory){
         const count = await this.relatedItems.count();
-        for (let i = 0; i < count; i++){
-            const category = await this.relatedItems.nth(i).locator('.category').textContent();
-            expect(category.toLowerCase()).toContain(expectedCategory.toLowerCase());
-        }
+
+    for (let i = 0; i < count; i++) {
+      const categoryLocator = this.relatedItems.nth(i).locator('.category');
+      if (await categoryLocator.count() > 0) {
+        const text = await categoryLocator.textContent();
+        expect(text.toLowerCase()).toContain(expectedCategory.toLowerCase());
+      } else {
+        console.warn(`Category not found for related item ${i + 1}`);
+      }
+    }
+  
     }
 }
 

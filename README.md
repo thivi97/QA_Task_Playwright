@@ -31,15 +31,19 @@ The automation is built using Playwright with JavaScript, following the Page Obj
 ```
 npm install
 
+```
 ⚙️ Install Playwright Browsers  
-
+```
 npx playwright install
 
+```
 ▶️ Run The Tests  
-
+```
 npx playwright test
 
+```
 🧪 Run a Specific Test  
-
+```
 npx playwright test tests/mainProductPage.spec.js
 
+```

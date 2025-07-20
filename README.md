@@ -8,26 +8,38 @@ The automation is built using Playwright with JavaScript, following the Page Obj
 
 📌 Features Covered
 
-✅ Load eBay home page and verify title
-✅ Search for a product (e.g., wallet)
-✅ Click and validate the first product from results
-✅ Extract and validate product title. price, description
-✅ Handle fallback if product price/ description is missing
-✅ Validate the related product section 
-✅ Handle page reload and verify item consistency
-✅ Test fallback/ error 
+✅ Load eBay home page and verify title  
+
+✅ Search for a product (e.g., wallet)  
+
+✅ Click and validate the first product from results  
+
+✅ Extract and validate product title. price, description  
+
+✅ Handle fallback if product price/ description is missing  
+
+✅ Validate the related product section  
+
+✅ Handle page reload and verify item consistency  
+
+✅ Test fallback/ error  
+
 
 🛠️ Setup Instructions
 
-📥 Install Dependencies
+📥 Install Dependencies  
+
 npm install
 
-⚙️ Install Playwright Browsers
+⚙️ Install Playwright Browsers  
+
 npx playwright install
 
-▶️ Run The Tests
+▶️ Run The Tests  
+
 npx playwright test
 
-🧪 Run a Specific Test
+🧪 Run a Specific Test  
+
 npx playwright test tests/mainProductPage.spec.js
 

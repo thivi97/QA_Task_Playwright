@@ -28,22 +28,22 @@ The automation is built using Playwright with JavaScript, following the Page Obj
 🛠️ Setup Instructions
 
 📥 Install Dependencies  
-```
+```bash
 npm install
 
 ```
 ⚙️ Install Playwright Browsers  
-```
+```bash
 npx playwright install
 
 ```
 ▶️ Run The Tests  
-```
+```bash
 npx playwright test
 
 ```
 🧪 Run a Specific Test  
-```
+```bash
 npx playwright test tests/mainProductPage.spec.js
 
 ```

@@ -28,7 +28,7 @@ The automation is built using Playwright with JavaScript, following the Page Obj
 🛠️ Setup Instructions
 
 📥 Install Dependencies  
-
+```
 npm install
 
 ⚙️ Install Playwright Browsers  
